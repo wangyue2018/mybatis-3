@@ -38,8 +38,15 @@ import org.apache.ibatis.session.Configuration;
  */
 public class XMLStatementBuilder extends BaseBuilder {
 
+
   private final MapperBuilderAssistant builderAssistant;
+  /**
+   * 当前 XML 节点，例如：<select />、<insert />、<update />、<delete /> 标签
+   */
   private final XNode context;
+  /**
+   * 要求的 databaseId
+   */
   private final String requiredDatabaseId;
 
   public XMLStatementBuilder(Configuration configuration, MapperBuilderAssistant builderAssistant, XNode context) {
@@ -54,13 +61,15 @@ public class XMLStatementBuilder extends BaseBuilder {
   }
 
   public void parseStatementNode() {
+    // <1> 获得 id 属性，编号。
     String id = context.getStringAttribute("id");
+    // <2> 获得 databaseId ， 判断 databaseId 是否匹配
     String databaseId = context.getStringAttribute("databaseId");
 
     if (!databaseIdMatchesCurrent(id, databaseId, this.requiredDatabaseId)) {
       return;
     }
-
+    // <3> 获得各种属性
     String nodeName = context.getNode().getNodeName();
     SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
     boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
@@ -76,6 +85,7 @@ public class XMLStatementBuilder extends BaseBuilder {
     Class<?> parameterTypeClass = resolveClass(parameterType);
 
     String lang = context.getStringAttribute("lang");
+    // <4> 获得 lang 对应的 LanguageDriver 对象
     LanguageDriver langDriver = getLanguageDriver(lang);
 
     // Parse selectKey after includes and remove them.
