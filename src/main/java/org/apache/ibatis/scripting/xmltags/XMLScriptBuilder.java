@@ -30,6 +30,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * XML 动态语句( SQL )构建器，负责将 SQL 解析成 SqlSource 对象
+ *
  * @author Clinton Begin
  */
 public class XMLScriptBuilder extends BaseBuilder {
@@ -63,6 +65,10 @@ public class XMLScriptBuilder extends BaseBuilder {
     nodeHandlerMap.put("bind", new BindHandler());
   }
 
+  /**
+   * 负责将 SQL 解析成 SqlSource 对象
+   * @return SqlSource
+   */
   public SqlSource parseScriptNode() {
     MixedSqlNode rootSqlNode = parseDynamicTags(context);
     SqlSource sqlSource;
@@ -74,6 +80,11 @@ public class XMLScriptBuilder extends BaseBuilder {
     return sqlSource;
   }
 
+  /**
+   * 解析 SQL 成 MixedSqlNode
+   * @param node
+   * @return MixedSqlNode
+   */
   protected MixedSqlNode parseDynamicTags(XNode node) {
     List<SqlNode> contents = new ArrayList<>();
     NodeList children = node.getNode().getChildNodes();
@@ -102,6 +113,12 @@ public class XMLScriptBuilder extends BaseBuilder {
   }
 
   private interface NodeHandler {
+    /**
+     * 处理 Node
+     *
+     * @param nodeToHandle 要处理的 XNode 节点
+     * @param targetContents 目标的 SqlNode 数组。实际上，被处理的 XNode 节点会创建成对应的 SqlNode 对象，添加到 targetContents 中
+     */
     void handleNode(XNode nodeToHandle, List<SqlNode> targetContents);
   }
 
